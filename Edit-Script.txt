@@ -1,0 +1,116 @@
+let myStreamData;
+
+        var newData = {
+          date: "",
+          competitions: "all",
+          search: "",
+          status: "all",
+          limit: $(".total").text(),
+          type: $("#type").val(),
+          _token: $('meta[name="csrf-token"]').attr("content"),
+        };
+
+
+        async function _getInfoLinkStreamOfMatch(
+          requestUrl,
+          method,
+          params,
+          hideDetail = true
+        ) {
+          try {
+            var res = await callAjax(requestUrl, method, params);
+            var statusCode = res.statusCode;
+
+            if (statusCode === 2) {
+              var streams = res.data;
+
+                myStreamData = streams.myStream
+
+            } else {
+              console.error("Error:", res.message);
+            }
+
+            $("#loading").fadeOut(500);
+          } catch (error) {
+            console.error("Error:", error);
+            $("#loading").fadeOut(500);
+          }
+        }
+
+        // Correct function call
+         _getInfoLinkStreamOfMatch("/dashboard/", "POST", newData);
+
+
+
+
+
+
+
+
+async function _getInfoLinkStreamOfMatch(
+      requestUrl,
+      method,
+      params,
+      hideDetail = true
+    ) {
+      try {
+        var res = await callAjax(requestUrl, method, params);
+        var statusCode = res.statusCode;
+
+        if (statusCode === 2) {
+          var streams = res.data
+
+                             var data = {
+                  _token: $('meta[name="csrf-token"]').attr("content"),
+                  id: streams[0].id,
+                  channel_name: "ESPN + HD",
+                  link: "https://footy1.tk/4832",
+                  stream_type: "Web",
+                  quality: "HD",
+                  language: "English",
+                  ads: "1",
+                  bitrate: "4000",
+                  misr: "2MB",
+                  visible: true,
+                  mobile_compatible: true,
+                  nsfw: false,
+                  adblock: false,
+                  type: $("#type").val(),
+                };
+                MakeActualAjaxCall("/streams/edit", "POST", data);
+            
+        } else {
+          console.error("Error:", res.message);
+        }
+
+        $("#loading").fadeOut(500);
+      } catch (error) {
+        console.error("Error:", error);
+        $("#loading").fadeOut(500);
+      }
+    }
+
+myStreamData.forEach(async (myStream)=>{
+
+    await _getInfoLinkStreamOfMatch("/streams/link-of-match", "POST", {
+       matchId : myStream,
+      _token: $('meta[name="csrf-token"]').attr("content"),
+    });
+    })
+
+
+
+
+    async function MakeActualAjaxCall(url, method, data) {
+      try {
+        await $.ajax({
+          url: url,
+          data: data,
+          type: method,
+        });
+
+        console.log("Posted Successfully");
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    }
